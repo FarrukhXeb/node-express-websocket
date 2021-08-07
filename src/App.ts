@@ -1,7 +1,7 @@
 import express from "express";
 import { Server as SocketServer } from "socket.io";
 import { Server, createServer } from "http";
-// import cors from "cors";
+import cors from "cors";
 import ChatEvent from "./constants";
 // import { ChatMessage } from "./types";
 
@@ -18,19 +18,19 @@ class App {
 
   constructor() {
     this._app = express();
-    this.port = process.env.PORT as string;
-    // this._app.use(
-    //   cors({
-    //     origin: "*",
-    //   })
-    // );
+    this.port = +process.env.PORT!;
+    this._app.use(cors());
     this.server = createServer(this._app);
     this.initSocket();
     this.listen();
   }
 
   private initSocket(): void {
-    this.io = new SocketServer(this.server);
+    this.io = new SocketServer(this.server, {
+      cors: {
+        origin: "http://localhost:3000",
+      },
+    });
   }
 
   private listen(): void {
@@ -40,7 +40,9 @@ class App {
 
     this.io.on(ChatEvent.CONNECT, (socket: any) => {
       console.log("Connected client on port %s.", this.port);
-
+      socket.on("message", ({ message }: { message: string }) => {
+        console.log("got a message", message);
+      });
       // socket.on(ChatEvent.MESSAGE, (m: ChatMessage) => {
       //   console.log("[server](message): %s", JSON.stringify(m));
       //   this.io.emit("message", m);
