@@ -1,13 +1,8 @@
 import dotenv from "dotenv";
-import path from "path";
-import express from "express";
+import { join } from "path";
+import App from "./App";
 
-dotenv.config({ path: path.join(__dirname, "../", ".env") });
+dotenv.config({ path: join(__dirname, "../", ".env") });
+const { app } = new App();
 
-function main() {
-  const app = express();
-  app.listen(() => {
-    console.log(`Server listening on port ${process.env.PORT}`);
-  });
-}
-main();
+app.listen();
